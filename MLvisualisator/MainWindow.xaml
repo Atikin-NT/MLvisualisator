@@ -21,7 +21,6 @@
         </StackPanel>
         <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Grid.Column="0" Grid.Row="1">
             <Canvas Name="TestAdd">
-                
             </Canvas>
         </ScrollViewer>
     </Grid>

@@ -1,0 +1,48 @@
+{
+  "NeuronsList": [
+    {
+      "Index": 0,
+      "Count": 2
+    },
+    {
+      "Index": 1,
+      "Count": 3
+    },
+    {
+      "Index": 2,
+      "Count": 2
+    },
+    {
+      "Index": 3,
+      "Count": 5
+    }
+  ],
+  "ManyToMany": 1,
+  "Links": [
+    {
+      "Index": "00",
+      "Lines": "01|11|21|e",
+      "Weights": ""
+    },
+    {
+      "Index": "10",
+      "Lines": "01|e",
+      "Weights": ""
+    },
+    {
+      "Index": "01",
+      "Lines": "02|12|e",
+      "Weights": ""
+    },
+    {
+      "Index": "11",
+      "Lines": "02|12|e",
+      "Weights": ""
+    },
+    {
+      "Index": "21",
+      "Lines": "02|e",
+      "Weights": ""
+    }
+  ]
+}

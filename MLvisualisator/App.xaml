@@ -4,6 +4,20 @@
              xmlns:local="clr-namespace:MLvisualisator"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <Style x:Key="HoverNeuronColor" TargetType="{x:Type Ellipse}">
+            <Style.Setters>
+                <Setter Property="Fill" Value="#66CC00"></Setter>
+                <Setter Property="Stroke" Value="#66CC00"></Setter>
+                <Setter Property="StrokeThickness" Value="3"></Setter>
+                <Setter Property="Cursor" Value="Arrow"></Setter>
+            </Style.Setters>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Fill" Value="#8ACC47"></Setter>
+                    <Setter Property="Stroke" Value="#54A800"></Setter>
+                    <Setter Property="Cursor" Value="Hand"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Application.Resources>
 </Application>

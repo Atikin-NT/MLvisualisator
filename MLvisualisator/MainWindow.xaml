@@ -21,6 +21,10 @@
         </StackPanel>
         <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Grid.Column="0" Grid.Row="1">
             <Canvas Name="TestAdd">
+                <Canvas.Resources>
+                    <Style TargetType="Ellipse" BasedOn="{StaticResource HoverNeuronColor}"></Style>
+                </Canvas.Resources>
+                <Ellipse x:Name="TestEll" Width="50" Height="50" Style="{StaticResource HoverNeuronColor}"/>
             </Canvas>
         </ScrollViewer>
     </Grid>

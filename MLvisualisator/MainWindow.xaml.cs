@@ -35,6 +35,12 @@ namespace MLvisualisator
         public string Lines { get; set; }
         public string Weights { get; set; }
     }
+    class SizeConfig
+    {
+        public int NeuronRadius { get; set; } = 100;
+        public int Height { get; set; } = 175;
+        public int Width { get; set; } = 175;
+    }
 
     public partial class MainWindow : Window
     {
@@ -42,72 +48,8 @@ namespace MLvisualisator
         {
             InitializeComponent();
         }
-        private MlData addDataFromJson()
-        {
-            MlData ml_data = new MlData();
-            using (FileStream fstream = File.OpenRead("ml_config.json"))
-            {
-                // преобразуем строку в байты
-                byte[] array = new byte[fstream.Length];
-                // считываем данные
-                fstream.Read(array, 0, array.Length);
-                // декодируем байты в строку
-                string json_file = System.Text.Encoding.Default.GetString(array);
-                ml_data = JsonConvert.DeserializeObject<MlData>(json_file);
-            }
-            return ml_data;
-        }
 
-        private void addNeuron(string id, int columCanvas, int rowCanvas)
-        {
-            Ellipse ell = new Ellipse();
-            SolidColorBrush mySolidColorBrush = new SolidColorBrush();
-            mySolidColorBrush.Color = Color.FromArgb(28, 28, 28, 0);
-            ell.Width = 30;
-            ell.Height = 30;
-            ell.Fill = mySolidColorBrush;
-            ell.Name = id;
-
-            Canvas.SetLeft(ell, columCanvas);
-            Canvas.SetTop(ell, rowCanvas);
-            Panel.SetZIndex(ell, 2);
-            Canvas.SetZIndex(ell, 2);
-
-            TestAdd.Children.Add(ell);
-        }
-        private void addLine(string start, string end)
-        {
-            Ellipse first = new Ellipse();
-            Ellipse second = new Ellipse();
-            var allElments = TestAdd.Children.OfType<Ellipse>();
-            foreach (Ellipse element in allElments)
-            {
-                if (element.Name == "N" + start) first = element;
-                if (element.Name == "N" + end) second = element;
-            }
-            double x1 = Canvas.GetLeft(first);
-            double y1 = Canvas.GetTop(first);
-            double x2 = Canvas.GetLeft(second);
-            double y2 = Canvas.GetTop(second);
-
-            Line line = new Line();
-            line.X1 = x1 + 15;
-            line.X2 = x2 + 15;
-            line.Y1 = y1 + 15;
-            line.Y2 = y2 + 15;
-            line.Name = "W" + start + "_" + end;
-            line.StrokeThickness = 4;
-
-            SolidColorBrush mySolidColorBrush = new SolidColorBrush();
-            mySolidColorBrush.Color = Color.FromArgb(120, 255, 0, 0);
-
-            line.Stroke = mySolidColorBrush;
-
-            Panel.SetZIndex(line, 0);
-            Canvas.SetZIndex(line, 0);
-
-            TestAdd.Children.Add(line);
-        }
+        SizeConfig sc = new SizeConfig();
         private List<string> find_links(string data)
         {
             List<string> res = new List<string>();
@@ -129,24 +71,26 @@ namespace MLvisualisator
         {
             TestAdd.Children.Clear();
             // draw neurons
-            MlData ml_data = addDataFromJson();
+            MlData ml_data = getDataFromJson();
             int colums = ml_data.NeuronsList.Count;
             int columCanvas = 0;
+            double maxHeigh = FindHeight(ml_data.NeuronsList);
 
             for (int i = 0; i < colums; i++)
             {
-                int rowCanvas = 0;
                 int rows = ml_data.NeuronsList[i].Count;
+                double rowCanvas = (maxHeigh - rows * sc.Height) / 2.0;
                 for (int j = 0; j < rows; j++)
                 {
                     string ind = $"N{j}{i}";
                     addNeuron(ind, columCanvas, rowCanvas);
-                    rowCanvas += 50;
+                    rowCanvas += sc.Height;
                 }
                 TestAdd.Height = rowCanvas;
-                columCanvas += 60;
+                columCanvas += sc.Width;
             }
             TestAdd.Width = columCanvas;
+                
 
             //draw links
             for (int k = 0; k < ml_data.Links.Count; k++)
@@ -161,6 +105,17 @@ namespace MLvisualisator
                 }
             }
 
+            foreach (UIElement item in TestAdd.Children)
+            {
+                if (item is Ellipse)
+                {
+                    Panel.SetZIndex(item, 1);
+                }
+                else
+                {
+                    Panel.SetZIndex(item, 0);
+                }
+            }
         }
     }
 }

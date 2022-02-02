@@ -80,7 +80,42 @@ namespace MLvisualisator
 
             Panel.SetZIndex(ell, 2);
 
+            // draw text in ellipse
+
+            TextBlock txt = new TextBlock
+            {
+                Name = id + "_txt",
+                Text = "-1",
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = Brushes.Black,
+            };
+
+            Grid gr = new Grid
+            {
+                Width = sc.NeuronRadius,
+                Height = sc.NeuronRadius,
+                Name = id + "_gr",
+            };
+
+            Canvas.SetLeft(gr, columCanvas);
+            Canvas.SetTop(gr, rowCanvas);
+
+            Panel.SetZIndex(gr, 3);
+
+            gr.Children.Add(txt);
+
             TestAdd.Children.Add(ell);
+            TestAdd.Children.Add(gr);
+        }
+        private void NeuronChangecolor(Ellipse ell, int color)
+        {
+            if (color == 0) ell.Fill = Brushes.Green;
+            else ell.Fill = Brushes.Red;
+        }
+        private void LineChangeColor(Line line)
+        {
+            line.Stroke = Brushes.Red;
         }
     }
 }

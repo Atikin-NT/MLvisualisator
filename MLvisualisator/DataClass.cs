@@ -25,5 +25,22 @@ namespace MLvisualisator
             }
             return ml_data;
         }
+        private int compareNameAndStep(string name, int step)
+        {
+            string strStep = step.ToString();
+            int j = 0;
+            int startFlag = 0;
+            for (int i = 1; i < name.Length; i++)
+            {
+                if (name[i - 1] == '_') startFlag = 1;
+                if (startFlag == 1)
+                {
+                    if (name[i] != strStep[j]) return 0;
+                    j++;
+                    if (j == strStep.Length) return 1;
+                }
+            }
+            return 0;
+        }
     }
 }

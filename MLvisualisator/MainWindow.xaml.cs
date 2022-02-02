@@ -44,12 +44,14 @@ namespace MLvisualisator
 
     public partial class MainWindow : Window
     {
+        public int step = 0;
         public MainWindow()
         {
             InitializeComponent();
         }
 
         SizeConfig sc = new SizeConfig();
+        MlData ml_data = new MlData();
         private List<string> find_links(string data)
         {
             List<string> res = new List<string>();
@@ -69,9 +71,10 @@ namespace MLvisualisator
         }
         private void GenerateFun(object sender, RoutedEventArgs e)
         {
+            step = 0;
             TestAdd.Children.Clear();
             // draw neurons
-            MlData ml_data = getDataFromJson();
+            ml_data = getDataFromJson();
             int colums = ml_data.NeuronsList.Count;
             int columCanvas = 0;
             double maxHeigh = FindHeight(ml_data.NeuronsList);
@@ -82,7 +85,7 @@ namespace MLvisualisator
                 double rowCanvas = (maxHeigh - rows * sc.Height) / 2.0;
                 for (int j = 0; j < rows; j++)
                 {
-                    string ind = $"N{j}{i}";
+                    string ind = $"N{j}_{i}";
                     addNeuron(ind, columCanvas, rowCanvas);
                     rowCanvas += sc.Height;
                 }
@@ -104,18 +107,37 @@ namespace MLvisualisator
                     addLine(name, neu_to_neu[j]);
                 }
             }
-
-            foreach (UIElement item in TestAdd.Children)
+        }
+        private void NextFun(object sender, RoutedEventArgs e)
+        {
+            if (step == ml_data.NeuronsList.Count)
             {
-                if (item is Ellipse)
+                for (int i = 0; i < TestAdd.Children.Count; i++)
                 {
-                    Panel.SetZIndex(item, 1);
+                    UIElement childe = TestAdd.Children[i];
+                    if (childe is Ellipse ellipse)
+                    {
+                        string name = (string)childe.GetValue(NameProperty);
+                        if (compareNameAndStep(name, step - 1) == 1) NeuronChangecolor(ellipse, 0);
+                    }
                 }
-                else
+                step = 0;
+            }
+
+            if (step == 0) NextBtn.Content = "Next";
+
+            for (int i = 0; i < TestAdd.Children.Count; i++)
+            {
+                UIElement childe = TestAdd.Children[i];
+                if (childe is Ellipse ellipse)
                 {
-                    Panel.SetZIndex(item, 0);
+                    string name = (string)childe.GetValue(NameProperty);
+
+                    if (compareNameAndStep(name, step) == 1) NeuronChangecolor(ellipse, 1);
+                    if (step != 0 && compareNameAndStep(name, step - 1) == 1) NeuronChangecolor(ellipse, 0);
                 }
             }
+            step ++;
         }
     }
 }

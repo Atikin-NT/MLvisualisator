@@ -16,29 +16,29 @@
   "ManyToMany": 1,
   "Links": [
     {
-      "Index": "00",
-      "Lines": "01|11|21|e",
-      "Weights": ""
+      "Index": "0_0",
+      "Lines": "0_1|1_1|2_1|e",
+      "Weights": "5|4|-1|e"
     },
     {
-      "Index": "10",
-      "Lines": "01|e",
-      "Weights": ""
+      "Index": "1_0",
+      "Lines": "0_1|e",
+      "Weights": "1|e"
     },
     {
-      "Index": "01",
-      "Lines": "02|12|e",
-      "Weights": ""
+      "Index": "0_1",
+      "Lines": "0_2|1_2|e",
+      "Weights": "0.5|-0.5|e"
     },
     {
-      "Index": "11",
-      "Lines": "02|12|e",
-      "Weights": ""
+      "Index": "1_1",
+      "Lines": "0_2|1_2|e",
+      "Weights": "1|-1|e"
     },
     {
-      "Index": "21",
-      "Lines": "02|e",
-      "Weights": ""
+      "Index": "2_1",
+      "Lines": "0_2|e",
+      "Weights": "-1|e"
     }
   ]
 }

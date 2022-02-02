@@ -18,13 +18,17 @@
             <TextBox Name="CCountOfNeyrons" Width="200" Margin="10" BorderBrush="Aqua"></TextBox>
             <TextBox Name="CountOfColum" Width="200" Margin="10" BorderBrush="Aqua"></TextBox>
             <Button Name="Generate" Content="Generate" Click="GenerateFun"/>
+            <Button Name="NextBtn" Content="start" Click="NextFun"/>
         </StackPanel>
         <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Grid.Column="0" Grid.Row="1">
             <Canvas Name="TestAdd">
                 <Canvas.Resources>
                     <Style TargetType="Ellipse" BasedOn="{StaticResource HoverNeuronColor}"></Style>
                 </Canvas.Resources>
-                <Ellipse x:Name="TestEll" Width="50" Height="50" Style="{StaticResource HoverNeuronColor}"/>
+                <Ellipse Width="50" Height="50" Fill="Red" Canvas.Left="0" Canvas.Top="0"></Ellipse>
+                <Grid Width="50" Height="50" Canvas.Left="0" Canvas.Top="0">
+                    <TextBlock Text="Hello" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
             </Canvas>
         </ScrollViewer>
     </Grid>

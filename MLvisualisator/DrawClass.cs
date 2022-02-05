@@ -33,6 +33,9 @@ namespace MLvisualisator
             return res;
         }
 
+        private void changeInputsParams(Ellipse ell)
+        {
+        }
         private void addLine(string start, string end)
         {
             Ellipse first = new Ellipse();
@@ -64,10 +67,8 @@ namespace MLvisualisator
 
             TestAdd.Children.Add(line);
         }
-        private void addNeuron(string id, int columCanvas, double rowCanvas)
+        private void addNeuron(string id, double value, int columCanvas, double rowCanvas)
         {
-            Style style = (Style)FindResource("HoverNeuronColor");
-
             Ellipse ell = new Ellipse
             {
                 Width = sc.NeuronRadius,
@@ -85,7 +86,7 @@ namespace MLvisualisator
             TextBlock txt = new TextBlock
             {
                 Name = id + "_txt",
-                Text = "-1",
+                Text = value.ToString(),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Foreground = Brushes.Black,

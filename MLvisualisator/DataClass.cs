@@ -42,5 +42,24 @@ namespace MLvisualisator
             }
             return 0;
         }
+
+        private List<double> MatrixMultiplication(List<double> I, List<List<double>> W)
+        {
+            List<double> X = new List<double>();
+
+            // X = W * I
+
+            for(int i = 0; i < W.Count; i++)
+            {
+                double element = 0.0;
+                for(int j = 0; j < W[i].Count; j++)
+                {
+                    element += W[i][j] * I[j];
+                }
+                X.Add(element);
+            }
+
+            return X;
+        }
     }
 }

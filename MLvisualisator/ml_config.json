@@ -13,32 +13,111 @@
       "Count": 2
     }
   ],
-  "ManyToMany": 1,
+  "ManyToMany": 0,
   "Links": [
     {
       "Index": "0_0",
-      "Lines": "0_1|1_1|2_1|e",
-      "Weights": "5|4|-1|e"
+      "Value": 0.0,
+      "Paths": [
+        {
+          "Path": "0_1",
+          "Weight": 5
+        },
+        {
+          "Path": "1_1",
+          "Weight": 4
+        },
+        {
+          "Path": "2_1",
+          "Weight": -1
+        }
+      ]
     },
     {
       "Index": "1_0",
-      "Lines": "0_1|e",
-      "Weights": "1|e"
+      "Value": 0.0,
+      "Paths": [
+        {
+          "Path": "0_1",
+          "Weight": 1
+        }
+      ]
     },
     {
       "Index": "0_1",
-      "Lines": "0_2|1_2|e",
-      "Weights": "0.5|-0.5|e"
+      "Value": 0.0,
+      "Paths": [
+        {
+          "Path": "0_2",
+          "Weight": 0.5
+        },
+        {
+          "Path": "1_2",
+          "Weight": -0.5
+        }
+      ]
     },
     {
       "Index": "1_1",
-      "Lines": "0_2|1_2|e",
-      "Weights": "1|-1|e"
+      "Value": 0.0,
+      "Paths": [
+        {
+          "Path": "0_2",
+          "Weight": 1
+        },
+        {
+          "Path": "1_2",
+          "Weight": -1
+        }
+      ]
     },
     {
       "Index": "2_1",
-      "Lines": "0_2|e",
-      "Weights": "-1|e"
+      "Value": 0.0,
+      "Paths": [
+        {
+          "Path": "0_2",
+          "Weight": -1
+        }
+      ]
+    },
+    {
+      "Index": "0_2",
+      "Value": 0.0,
+      "Paths": [
+        {
+
+        }
+      ]
+    },
+    {
+      "Index": "1_2",
+      "Value": 0.0,
+      "Paths": [
+        {
+
+        }
+      ]
+    }
+  ],
+  "Inputs": [
+    {
+      "Name": "0_0",
+      "Value":  2
+    },
+    {
+      "Name": "1_0",
+      "Value": 5
+    }
+  ],
+  "Outputs": [
+    {
+      "Name": "0_2",
+      "Value": 1
+    },
+    {
+      "Name": "1_2",
+      "Value": 1
     }
   ]
 }

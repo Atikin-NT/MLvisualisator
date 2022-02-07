@@ -35,6 +35,7 @@ namespace MLvisualisator
     {
         public string Index { get; set; }
         public double Value { get; set; }
+        public double Error { get; set; } = 0.0;
         public List<CurrPath> Paths { get; set; }
     }
     class Input_Output
@@ -55,26 +56,17 @@ namespace MLvisualisator
         public int Width { get; set; } = 175;
     }
 
-    class Matrix
-    {
-        public List<double> OutputList { get; set; }
-        public List<double> InputList { get; set; }
-        public List<List<double>> Weights { get; set; }
-        public List<List<double>> Current { get; set; }
-
-    }
-
     public partial class MainWindow : Window
     {
         public int step = 0;
+        public int reverse_flag = 0;
         public MainWindow()
         {
             InitializeComponent();
         }
 
         SizeConfig sc = new SizeConfig();
-        MlData ml_data = new MlData();
-        Matrix matrixConfig = new Matrix();
+        MlData ml_data = new MlData();  // вообще все данные по нейронам
         private void GenerateFun(object sender, RoutedEventArgs e)
         {
             step = 0;
@@ -121,13 +113,37 @@ namespace MLvisualisator
         {
             if (step == ml_data.NeuronsList.Count)
             {
+
+                // find errors
+                List<double> errors = new List<double>();
+
+                for(int i = ml_data.Links.Count - 1; i > ml_data.Links.Count - ml_data.Outputs.Count; i--)
+                {
+                    ml_data.Links[i].Error = (ml_data.Outputs[ml_data.Links.Count - 1 - i].Value - ml_data.Links[i].Value) * ml_data.Links[i].Value * (1 - ml_data.Links[i].Value);
+                    for(int j = 0; j < ml_data.Links[i].Paths.Count; j++)
+                    {
+                        string path_Name = ml_data.Links[i].Paths[j].Path;
+                        for(int k = i - 1; k > 0; k--)
+                        {
+                            if (ml_data.Links[k].Index == path_Name)
+                            {
+                                ml_data.Links[k].Error += ShareOfWeight(ml_data.Links[i].Paths, ml_data.Links[i].Paths[j].Weight) * ml_data.Links[i].Error * 0.85;
+                            }
+                        }
+                    }
+                }
+
+                // edit global error
+
+
+
                 for (int i = 0; i < TestAdd.Children.Count; i++)
                 {
                     UIElement childe = TestAdd.Children[i];
                     if (childe is Ellipse ellipse)
                     {
                         string name = (string)childe.GetValue(NameProperty);
-                        if (compareNameAndStep(name, step - 1) == 1) NeuronChangecolor(ellipse, 0);
+                        if (CompareNameAndStep(name, step - 1) == 1) NeuronChangecolor(ellipse, 0);
                     }
                 }
                 step = 0;
@@ -138,76 +154,65 @@ namespace MLvisualisator
                 for (int i = 0; i < TestAdd.Children.Count; i++)
                 {
                     UIElement childe = TestAdd.Children[i];
-                    string name = (string)childe.GetValue(NameProperty);
-                    if (compareNameAndStep(name, step) == 1) 
+                    string name = (string)childe.GetValue(NameProperty);  // чисто для удобства записываем имя в переменную
+                    if (CompareNameAndStep(name, step) == 1)
                     {
-                        int id = (int)name[1] - 48;
-                        ml_data.Links[id].Value = ml_data.Inputs[id].Value;
+                        int row = GetRowFromName(name);
+                        ml_data.Links[row].Value = ml_data.Inputs[row].Value;  // у нас всегда сначала в списке идут стартовые элементы, поэтому пишем [row]
                         if (childe is Ellipse ellipse)
                         {
                             NeuronChangecolor(ellipse, 1);
                         }
                         if (childe is Grid grdblock)
                         {
-                            if(grdblock.Children[0] is TextBlock txtblock) txtblock.Text = ml_data.Inputs[id].Value.ToString();
+                            TextBlock txtBlock = (TextBlock)grdblock.Children[0];
+                            txtBlock.Text = ml_data.Inputs[row].Value.ToString();
                         }
                     }
                 }
             }
             else
             {
-                for (int i = 0; i < ml_data.Links.Count; i++)
+                for (int i = 1; i < ml_data.Links.Count; i++)
                 {
-                    List<double> tmp = new List<double>();
                     string name = ml_data.Links[i].Index;
-                    if (compareNameAndStep(name, step) == 1)
+                    if (CompareNameAndStep(name, step) == 1)  // если мы попали на элемент в текущем столбце
                     {
-                        double value = 0;
-                        for (int j = 0; j < ml_data.Links.Count; j++)
+                        double value = 0;  // будущее значение этого элемента
+                        for (int j = i; j >= 0; j--)  // идем в обратную сторону, тк мы смотрим предыдущий столбец
                         {
-                            if (compareNameAndStep(ml_data.Links[j].Index, step - 1) == 1)
+                            if (CompareNameAndStep(ml_data.Links[j].Index, step - 1) == 1)  // если мы попали на элемент в предыдущем столбце
                             {
-                                double curr_value = 0;
-                                for (int k = 0; k < ml_data.Links[j].Paths.Count; k++)
+                                for (int k = 0; k < ml_data.Links[j].Paths.Count; k++)  // идем по ссылкам элемента из пред столбца
                                 {
-                                    if (ml_data.Links[j].Paths[k].Path == name)
+                                    if (ml_data.Links[j].Paths[k].Path == name)  // если есть ссылка на этот элемент
                                     {
-                                        curr_value = ml_data.Links[j].Paths[k].Weight * ml_data.Links[j].Value;
-                                        break;
+                                        value += ml_data.Links[j].Paths[k].Weight * ml_data.Links[j].Value;  // добавляем значение
+                                        break;  // и останвливаем
                                     }
                                 }
-                                value += curr_value;
                             }
                         }
-                        ml_data.Links[i].Value = value;
+                        ml_data.Links[i].Value = ActivationFunction(value);
                     }
                 }
 
                 // change color
 
-                for (int i = 0; i < TestAdd.Children.Count; i++)
+                for (int i = 0; i < TestAdd.Children.Count; i += 2)
                 {
                     UIElement childe = TestAdd.Children[i];
                     string name = (string)childe.GetValue(NameProperty);
-                    if (compareNameAndStep(name, step) == 1)
+                    if (name[0] == 'W') break;
+                    if (CompareNameAndStep(name, step) == 1)
                     {
-                        for (int j = 0; j < ml_data.Links.Count; j++)
-                        {
-                            if ("N" + ml_data.Links[j].Index == name || "N" + ml_data.Links[j].Index + "_gr" == name)
-                            {
-                                if (childe is Ellipse ellipse)
-                                {
-                                    NeuronChangecolor(ellipse, 1);
-                                }
-                                if (childe is Grid grdblock)
-                                {
-                                    if (grdblock.Children[0] is TextBlock txtblock) txtblock.Text = ml_data.Links[j].Value.ToString();
-                                }
-                                break;
-                            }
-                        }
+                        Ellipse ellipse = (Ellipse)childe;
+                        NeuronChangecolor(ellipse, 1);
+                        Grid grd = (Grid)TestAdd.Children[i + 1];
+                        TextBlock txtBlock = (TextBlock)grd.Children[0];
+                        txtBlock.Text = ml_data.Links[(i / 2)].Value.ToString();
                     }
-                    if (compareNameAndStep(name, step - 1) == 1 && childe is Ellipse ell) NeuronChangecolor(ell, 0);  // меняем цвет предыдущих нейронов
+                    if (CompareNameAndStep(name, step - 1) == 1 && childe is Ellipse ell) NeuronChangecolor(ell, 0);  // меняем цвет предыдущих нейронов
                 }
 
 

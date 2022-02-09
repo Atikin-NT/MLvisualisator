@@ -30,10 +30,14 @@ namespace MLvisualisator
             string strStep = step.ToString();
             int j = 0;
             int startFlag = 0;
-            for (int i = 3; i < name.Length; i++)
+            for (int i = 1; i < name.Length; i++)
             {
-                if (name[i - 1] == '_') startFlag = 1;
                 if (name[i] == '_' && startFlag == 1) break;
+                if (name[i] == '_')
+                {
+                    startFlag = 1;
+                    continue;
+                }
                 if (startFlag == 1)
                 {
                     if (name[i] != strStep[j]) return 0;
@@ -46,10 +50,10 @@ namespace MLvisualisator
         private int GetRowFromName(string name)
         {
             int row = 0;
-            for(int i = 1; i < name.Length; i++)
+            for(int i = 0; i < name.Length; i++)
             {
                 if (name[i] == '_') break;
-                row = (row * 10) + name[i] - 48;
+                row += (row * 10) + name[i] - 48;
             }
             return row;
         }

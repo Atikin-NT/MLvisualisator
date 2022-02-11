@@ -25,10 +25,23 @@
                 <Canvas.Resources>
                     <Style TargetType="Ellipse" BasedOn="{StaticResource HoverNeuronColor}"></Style>
                 </Canvas.Resources>
-                <Ellipse Width="50" Height="50" Fill="Red" Canvas.Left="0" Canvas.Top="0"></Ellipse>
+                <Ellipse Width="50" Height="50" Fill="Red" Canvas.Left="0" Canvas.Top="0" MouseUp="Button_MouseEnter_1"></Ellipse>
                 <Grid Width="50" Height="50" Canvas.Left="0" Canvas.Top="0">
                     <TextBlock Text="Hello" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 </Grid>
+
+                <Popup x:Name="popup1" StaysOpen="False" Placement="Mouse" MaxWidth="180"
+                        AllowsTransparency="True">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Name="DataHeader" TextWrapping="Wrap" Width="180" Background="LightPink" Opacity="0.8" Foreground="Black" FontSize="16">
+                        Данные нейрона 0_0
+                        </TextBlock>
+                        <TextBlock TextWrapping="WrapWithOverflow" Width="180" Height="100" Background="LightPink" Opacity="0.8">
+                            I = 0.9908 <LineBreak></LineBreak>
+                            w1 = -5 <LineBreak></LineBreak>
+                        </TextBlock>
+                    </StackPanel>
+                </Popup>
             </Canvas>
         </ScrollViewer>
     </Grid>

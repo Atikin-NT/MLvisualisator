@@ -70,30 +70,41 @@ namespace MLvisualisator
             return res;
         }
 
-        private double ShareOfWeight(List<CurrPath> paths, double curr_path)
+        private double ShareOfWeight(List<double> paths, double curr_path)
         {
             double sum = 0;
-            for (int i = 0; i < paths.Count; i++) sum += paths[i].Weight;
+            for (int i = 0; i < paths.Count; i++) sum += paths[i];
             return curr_path / sum;
         }
 
-        private List<double> MatrixMultiplication(List<double> I, List<List<double>> W)
+        private int CompareDrawNameAndClassName(string draw_name, string class_name, int line = 0, string to_name = "")
         {
-            List<double> X = new List<double>();
-
-            // X = W * I
-
-            for(int i = 0; i < W.Count; i++)
+            if (line == 1)
             {
-                double element = 0.0;
-                for(int j = 0; j < W[i].Count; j++)
+                int flag = 0;
+                int i = 0;
+                for (; i < draw_name.Length - 1; i++)
                 {
-                    element += W[i][j] * I[j];
+                    if (draw_name[i + 1] == '_' && flag == 1) break;
+                    if (draw_name[i + 1] == '_') flag = 1;
+                    if (draw_name[i + 1] != class_name[i]) return 0;
                 }
-                X.Add(element);
-            }
+                i++;
+                for ( int j = 0; j < to_name.Length; j++)
+                {
+                    if (draw_name[i] != to_name[j]) return 0;
+                    i++;
+                }
 
-            return X;
+            }
+            else
+            {
+                for (int i = 0; i < draw_name.Length - 1; i++)
+                {
+                    if (draw_name[i + 1] != class_name[i]) return 0;
+                }
+            }
+            return 1;
         }
     }
 }

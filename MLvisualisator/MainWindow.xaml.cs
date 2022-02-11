@@ -41,12 +41,13 @@ namespace MLvisualisator
     class Input_Output
     {
         public string Name { get; set; }
-        public int Value { get; set; }
+        public double Value { get; set; }
     }
     class CurrPath
     {
         public string Path { get; set; }
         public double Weight { get; set; }
+        public double Error { get; set; }
 
     }
     class SizeConfig
@@ -111,13 +112,14 @@ namespace MLvisualisator
         }
         private void Learn()
         {
+            int curr_step = step % ml_data.NeuronsList.Count;
             for (int i = 0; i < ml_data.Links.Count; i++)
             {
                 string name = ml_data.Links[i].Index;
-                if (CompareNameAndStep(name, step) == 1)  // если мы попали на элемент в текущем столбце
+                if (CompareNameAndStep(name, curr_step) == 1)  // если мы попали на элемент в текущем столбце
                 {
                     double value = 0;  // будущее значение этого элемента
-                    if (step == 0)
+                    if (curr_step == 0)
                     {
                         if (i == ml_data.Inputs.Count) break;
                         NextBtn.Content = "Next";
@@ -129,7 +131,7 @@ namespace MLvisualisator
                     {
                         for (int j = i - 1; j >= 0; j--)  // идем в обратную сторону, тк мы смотрим предыдущий столбец
                         {
-                            if (CompareNameAndStep(ml_data.Links[j].Index, step - 1) == 1)  // если мы попали на элемент в предыдущем столбце
+                            if (CompareNameAndStep(ml_data.Links[j].Index, curr_step - 1) == 1)  // если мы попали на элемент в предыдущем столбце
                             {
                                 for (int k = 0; k < ml_data.Links[j].Paths.Count; k++)  // идем по ссылкам элемента из пред столбца
                                 {
@@ -142,7 +144,7 @@ namespace MLvisualisator
                             }
                         }
                     }
-                    ml_data.Links[i].Value = step == 0 ? value : ActivationFunction(value);
+                    ml_data.Links[i].Value = ActivationFunction(value);
                 }
             }
 
@@ -153,7 +155,7 @@ namespace MLvisualisator
                 UIElement childe = TestAdd.Children[i];
                 string name = (string)childe.GetValue(NameProperty);
                 if (name[0] == 'W') break;
-                if (CompareNameAndStep(name, step) == 1)
+                if (CompareNameAndStep(name, curr_step) == 1)
                 {
                     Ellipse ellipse = (Ellipse)childe;
                     NeuronChangecolor(ellipse, 1);
@@ -161,7 +163,7 @@ namespace MLvisualisator
                     TextBlock txtBlock = (TextBlock)grd.Children[0];
                     txtBlock.Text = ml_data.Links[(i / 2)].Value.ToString();
                 }
-                if (step != 0 && CompareNameAndStep(name, step - 1) == 1 && childe is Ellipse ell) NeuronChangecolor(ell, 0);  // меняем цвет предыдущих нейронов
+                if (curr_step != 0 && CompareNameAndStep(name, curr_step - 1) == 1 && childe is Ellipse ell) NeuronChangecolor(ell, 0);  // меняем цвет предыдущих нейронов
             }
         }
         private void FindErrors()
@@ -180,6 +182,18 @@ namespace MLvisualisator
                             }
                         }
                     }
+
+                    // find all paths
+                    List<double> weightList = new List<double>();
+
+                    for (int j = 0; j < ml_data.Links.Count; j++)
+                    {
+                        for(int k = 0; k < ml_data.Links[j].Paths.Count; k++)
+                        {
+                            if (ml_data.Links[j].Paths[k].Path == ml_data.Links[i].Index) weightList.Add(ml_data.Links[j].Paths[k].Weight);
+                        }
+                    }
+
                     for (int j = i - 1; j > 0; j--)
                     {
                         if (CompareNameAndStep(ml_data.Links[j].Index, curr_step - 1) == 1) // если мы нашили нейрон из предыдущего слоя
@@ -188,8 +202,8 @@ namespace MLvisualisator
                             {
                                 if (ml_data.Links[j].Paths[k].Path == ml_data.Links[i].Index)
                                 {
-                                    ml_data.Links[j].Error += ShareOfWeight(ml_data.Links[i].Paths, ml_data.Links[j].Paths[k].Weight) * ml_data.Links[i].Error;  // подсчет ошибки для предыдущего слоя нейронов
-                                    ml_data.Links[j].Paths[k].Weight += 0.85 * ml_data.Links[i].Error * ml_data.Links[j].Value;
+                                    ml_data.Links[j].Error += ShareOfWeight(weightList, ml_data.Links[j].Paths[k].Weight) * ml_data.Links[i].Error;  // подсчет ошибки для предыдущего слоя нейронов
+                                    ml_data.Links[j].Paths[k].Error = ml_data.Links[i].Value * (1 - ml_data.Links[i].Value) * ml_data.Links[i].Error * ml_data.Links[j].Value;
                                 }
                             }
                         }
@@ -197,132 +211,41 @@ namespace MLvisualisator
                 }
             }
         }
-        private void NextFun(object sender, RoutedEventArgs e)
-        {
-            // я дописал функии прямого и обротного обученя, осталось лишь правильно их вызввать
 
-            if(step % (ml_data.NeuronsList.Count * 2) < ml_data.NeuronsList.Count)
+        public void SetNewData()
+        {
+            for (int i = 0; i < ml_data.Links.Count; i++)
             {
-                reverse_flag = 0;
-                Learn();
-            }
-            else
-            {
-                reverse_flag = 1;
-                if(step % (ml_data.NeuronsList.Count * 2) != 0)
+                for (int j = 0; j < ml_data.Links[i].Paths.Count; j++)
                 {
-                    FindErrors();
+                    ml_data.Links[i].Paths[j].Weight += ml_data.Links[i].Paths[j].Error;
                 }
             }
+        }
 
-            //if (step == ml_data.NeuronsList.Count && (step % (ml_data.NeuronsList.Count) == 0 && reverse_flag == 0 && step != 0))
-            //{
-            //    NextBtn.Content = "Reverse";
-            //    reverse_flag = 1;
-
-            //    // find errors
-
-            //    for (int i = ml_data.Links.Count - 1; i > ml_data.Links.Count - ml_data.Outputs.Count; i--) // пробегаемся только по последнему слою
-            //    {
-            //        ml_data.Links[i].Error = (ml_data.Outputs[ml_data.Links.Count - 1 - i].Value - ml_data.Links[i].Value) * ml_data.Links[i].Value * (1 - ml_data.Links[i].Value);  // подсчет ошибки на выходном нейроне
-            //        for(int j = 0; j < ml_data.Links[i].Paths.Count; j++)  // пробегаемся по весам этого нейрона в обратную сторону
-            //        {
-            //            string path_Name = ml_data.Links[i].Paths[j].Path;  // определенный вес 
-            //            for(int k = i - 1; k > 0; k--)
-            //            {
-            //                if (ml_data.Links[k].Index == path_Name)  // если на текущий нейрон указывает вес
-            //                {
-            //                    ml_data.Links[k].Error += ShareOfWeight(ml_data.Links[i].Paths, ml_data.Links[i].Paths[j].Weight) * ml_data.Links[i].Error * ml_data.Links[k].Value * (1 - ml_data.Links[k].Value);  // подсчет ошибки для предыдущего слоя нейронов
-            //                    ml_data.Links[i].Paths[j].Weight += 0.85 * ml_data.Links[i].Error * ml_data.Links[k].Value;
-            //                }
-            //            }
-            //        }
-            //    }
-
-            //    // edit global error
-
-            //    for (int i = 0; i < TestAdd.Children.Count; i++)
-            //    {
-            //        UIElement childe = TestAdd.Children[i];
-            //        if (childe is Ellipse ellipse)
-            //        {
-            //            string name = (string)childe.GetValue(NameProperty);
-            //            if (CompareNameAndStep(name, step - 1) == 1) NeuronChangecolor(ellipse, 0);
-            //        }
-            //    }
-            //    step++;
-            //}
-            //else if (step == 0 || (step % (ml_data.NeuronsList.Count - 1) == 0 && reverse_flag == 1))
-            //{
-            //    NextBtn.Content = "Next";
-            //    reverse_flag = 0;
-            //    for (int i = 0; i < TestAdd.Children.Count; i++)
-            //    {
-            //        UIElement childe = TestAdd.Children[i];
-            //        string name = (string)childe.GetValue(NameProperty);  // чисто для удобства записываем имя в переменную
-            //        if (CompareNameAndStep(name, step) == 1)
-            //        {
-            //            int row = GetRowFromName(name);
-            //            ml_data.Links[row].Value = ml_data.Inputs[row].Value;  // у нас всегда сначала в списке идут стартовые элементы, поэтому пишем [row]
-            //            if (childe is Ellipse ellipse)
-            //            {
-            //                NeuronChangecolor(ellipse, 1);
-            //            }
-            //            if (childe is Grid grdblock)
-            //            {
-            //                TextBlock txtBlock = (TextBlock)grdblock.Children[0];
-            //                txtBlock.Text = ml_data.Inputs[row].Value.ToString();
-            //            }
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    for (int i = 1; i < ml_data.Links.Count; i++)
-            //    {
-            //        string name = ml_data.Links[i].Index;
-            //        if (CompareNameAndStep(name, step) == 1)  // если мы попали на элемент в текущем столбце
-            //        {
-            //            double value = 0;  // будущее значение этого элемента
-            //            for (int j = i; j >= 0; j--)  // идем в обратную сторону, тк мы смотрим предыдущий столбец
-            //            {
-            //                if (CompareNameAndStep(ml_data.Links[j].Index, step - 1) == 1)  // если мы попали на элемент в предыдущем столбце
-            //                {
-            //                    for (int k = 0; k < ml_data.Links[j].Paths.Count; k++)  // идем по ссылкам элемента из пред столбца
-            //                    {
-            //                        if (ml_data.Links[j].Paths[k].Path == name)  // если есть ссылка на этот элемент
-            //                        {
-            //                            value += ml_data.Links[j].Paths[k].Weight * ml_data.Links[j].Value;  // добавляем значение
-            //                            break;  // и останвливаем
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //            ml_data.Links[i].Value = ActivationFunction(value);
-            //        }
-            //    }
-
-            //    // change color
-
-            //    for (int i = 0; i < TestAdd.Children.Count; i += 2)
-            //    {
-            //        UIElement childe = TestAdd.Children[i];
-            //        string name = (string)childe.GetValue(NameProperty);
-            //        if (name[0] == 'W') break;
-            //        if (CompareNameAndStep(name, step) == 1)
-            //        {
-            //            Ellipse ellipse = (Ellipse)childe;
-            //            NeuronChangecolor(ellipse, 1);
-            //            Grid grd = (Grid)TestAdd.Children[i + 1];
-            //            TextBlock txtBlock = (TextBlock)grd.Children[0];
-            //            txtBlock.Text = ml_data.Links[(i / 2)].Value.ToString();
-            //        }
-            //        if (CompareNameAndStep(name, step - 1) == 1 && childe is Ellipse ell) NeuronChangecolor(ell, 0);  // меняем цвет предыдущих нейронов
-            //    }
-
-
-            //}
-            step++;
+        private void NextFun(object sender, RoutedEventArgs e)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                if (step % (ml_data.NeuronsList.Count * 2) < ml_data.NeuronsList.Count)
+                {
+                    reverse_flag = 0;
+                    Learn();
+                }
+                else
+                {
+                    reverse_flag = 1;
+                    if (step % (ml_data.NeuronsList.Count * 2) != ml_data.NeuronsList.Count * 2 - 1)
+                    {
+                        FindErrors();
+                    }
+                    else
+                    {
+                        SetNewData();
+                    }
+                }
+                step++;
+            }
         }
     }
 }

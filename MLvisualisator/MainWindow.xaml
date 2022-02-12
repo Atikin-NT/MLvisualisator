@@ -18,7 +18,8 @@
             <TextBox Name="CCountOfNeyrons" Width="200" Margin="10" BorderBrush="Aqua"></TextBox>
             <TextBox Name="CountOfColum" Width="200" Margin="10" BorderBrush="Aqua"></TextBox>
             <Button Name="Generate" Content="Generate" Click="GenerateFun"/>
-            <Button Name="NextBtn" Content="start" Click="NextFun"/>
+            <Button Name="NextBtn" Content="Start" Click="NextFun"/>
+            <Button Name="Clear" Content="Clear" Click="ClearPopup"/>
         </StackPanel>
         <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Grid.Column="0" Grid.Row="1">
             <Canvas Name="TestAdd">
@@ -39,6 +40,8 @@
                         <TextBlock TextWrapping="WrapWithOverflow" Width="180" Height="100" Background="LightPink" Opacity="0.8">
                             I = 0.9908 <LineBreak></LineBreak>
                             w1 = -5 <LineBreak></LineBreak>
+                        </TextBlock>
+                        <TextBlock TextWrapping="WrapWithOverflow" Width="180" Height="100" Background="LightPink" Opacity="0.8" Text="Line1&#10;Line2">
                         </TextBlock>
                     </StackPanel>
                 </Popup>

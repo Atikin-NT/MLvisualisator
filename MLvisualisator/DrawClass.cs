@@ -41,9 +41,10 @@ namespace MLvisualisator
                 Popup popup = new Popup
                 {
                     Name = "popup" + i.ToString(),
-                    StaysOpen = false,
+                    IsOpen = false,
+                    StaysOpen = true,
                     Placement = PlacementMode.Mouse,
-                    MaxWidth = 180
+                    MaxWidth = 180,
                 };
                 StackPanel sp = new StackPanel
                 {
@@ -51,7 +52,7 @@ namespace MLvisualisator
                 };
                 TextBlock txtBlock = new TextBlock
                 {
-                    Name = "DataHeader" + "!",
+                    Name = "DataHeader" + "0",
                     Background = Brushes.LightPink,
                     Opacity = 0.8,
                     Foreground = Brushes.Black,
@@ -60,19 +61,22 @@ namespace MLvisualisator
                 };
                 TextBlock txtBlockData = new TextBlock
                 {
-                    Name = "DataNeuron" + "!",
+                    Name = "DataNeuron" + "0",
                     Background = Brushes.LightPink,
                     Opacity = 0.8,
                     Foreground = Brushes.Black,
                     FontSize = 14,
-                    Text = "Данные нейрона 0_0"
+                    Text = "Данные нейрона 0_0",
+                    TextWrapping = TextWrapping.WrapWithOverflow
+
                 };
                 sp.Children.Add(txtBlock);
                 sp.Children.Add(txtBlockData);
                 popup.Child = sp;
 
                 TestAdd.Children.Add(popup);
-                PopupList[i] = popup;
+
+                PopupList.Add(popup);
             }
         }
         private void addLine(string start, string end)
@@ -176,6 +180,48 @@ namespace MLvisualisator
             SolidColorBrush color = new SolidColorBrush(Color.FromRgb(37, 105, 173));
             color.Opacity = op;
             line.Stroke = color;
+        }
+
+        private void NeuronClick(object sender, MouseButtonEventArgs e)
+        {
+            Ellipse element = (Ellipse)sender;
+            string name = element.Name;
+            int count_active_popup = 0;
+
+            for (; count_active_popup < 5; count_active_popup++)
+            {
+                if (PopupList[count_active_popup].IsOpen == false) break;
+            }
+
+            Popup popup;
+            if (count_active_popup == 5)
+            {
+                popup = PopupList[0];
+                popup.IsOpen = false;
+
+                for (int i = 1; i < 5; i++)
+                {
+                    PopupList[i - 1] = PopupList[i];
+                }
+                PopupList[4] = popup;
+            }
+            else
+            {
+                popup = PopupList[count_active_popup];
+                popup.IsOpen = false;
+            }
+
+            StackPanel sp = (StackPanel)popup.Child;
+            TextBlock txtBlock = (TextBlock)sp.Children[0];
+            txtBlock.Text = "Данные нейрона " + name;
+
+            TextBlock txtBlockData = (TextBlock)sp.Children[1];
+
+            //addd TextData
+            CreateTextForPopup(txtBlockData, element);
+
+            popup.IsOpen = true;
+
         }
     }
 }

@@ -75,7 +75,7 @@ namespace MLvisualisator
         public int popupCount = 0;
         public string firstPopupName = "";
 
-        public List<Popup> PopupList = new List<Popup>(5);
+        public List<Popup> PopupList = new List<Popup>();
         public MainWindow()
         {
             InitializeComponent();
@@ -129,26 +129,9 @@ namespace MLvisualisator
                 }
             }
         }
-        private void NeuronClick(object sender, MouseButtonEventArgs e)
+        private void ClearPopup(object sender, RoutedEventArgs e)
         {
-            Ellipse element = (Ellipse)sender;
-            string name = element.Name;
-            if (popupCount == 5)
-            {
-                for (int i = 1; i < 5; i++)
-                {
-                    PopupList[i - 1] = PopupList[i];
-                }
-                Popup popup = PopupList[4];
-                StackPanel sp = (StackPanel)popup.Child;
-                TextBlock txtBlock = (TextBlock)sp.Children[0];
-                txtBlock.Text = name;
-            }
-            else
-            {
-
-            }
-
+            foreach (Popup popup in PopupList) popup.IsOpen = false;
         }
 
         private void Button_MouseEnter_1(object sender, MouseEventArgs e)
@@ -158,8 +141,8 @@ namespace MLvisualisator
 
         private void NextFun(object sender, RoutedEventArgs e)
         {
-            //for (int i = 0; i < 100; i++)
-            //{
+            for (int i = 0; i < 100; i++)
+            {
                 if (step % (ml_data.NeuronsList.Count * 2) < ml_data.NeuronsList.Count)
                 {
                     Learn();
@@ -176,7 +159,7 @@ namespace MLvisualisator
                     }
                 }
                 step++;
-            //}
+            }
         }
     }
 }

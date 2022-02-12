@@ -239,7 +239,6 @@ namespace MLvisualisator
                 }
             }
         }
-
         public void SetNewData()
         {
             for (int i = 0; i < ml_data.Links.Count; i++)
@@ -249,6 +248,22 @@ namespace MLvisualisator
                     ml_data.Links[i].Paths[j].Weight += ml_data.Links[i].Paths[j].Error;
                 }
             }
+        }
+        private void CreateTextForPopup(TextBlock txt, Ellipse ell)
+        {
+            string p = "";
+            for (int i = 0; i < ml_data.Links.Count; i++)
+            {
+                if (CompareDrawNameAndClassName(ell.Name, ml_data.Links[i].Index) == 1)
+                {
+                    p += "I = " + ml_data.Links[i].Value.ToString() + "\n";
+                    for (int j = 0; j < ml_data.Links[i].Paths.Count; j++)
+                    {
+                        p += "W" + ml_data.Links[i].Paths[j].Path + " = " + ml_data.Links[i].Paths[j].Weight.ToString() + "\n";
+                    }
+                }
+            }
+            txt.Text = string.Format(p);
         }
     }
 }
